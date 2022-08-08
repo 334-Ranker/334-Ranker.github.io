@@ -3,11 +3,93 @@
 
 <head>
     <meta charset="utf-8" />
-    <title></title>
+    <title>334-Ranker</title>
+    <style type="text/css">
+        table.res {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        table.res th,
+        table.res td {
+            padding: 4px;
+            text-align: center;
+        }
+
+        table.res tr:nth-child(odd) {
+            background-color: #eee
+        }
+    </style>
 </head>
 
 <body>
-    334-Ranker test
+    <h1>334-Ranker</h1>
+    <table>
+        <tr>
+            <td>DATE-MIN</td>
+            <td>DATE-MAX</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td> <input type="date" id="dateMin">
+            </td>
+            <td> <input type="date" id="dateMax">
+            </td>
+            <td> <input type="submit" id="submit">
+            </td>
+        </tr>
+    </table>
+    <div id="res"></div>
+    <script type="text/javascript">
+        const EncodeHTMLForm = (data) => {
+            let params = [];
+            for (let name in data) {
+                let value = data[name];
+                let param = encodeURIComponent(name) + '=' + encodeURIComponent(value);
+                params.push(param);
+            }
+            return params.join('&').replace(/%20/g, '+');
+        }
+        const ajax = (url, data, success) => {
+            let req = new XMLHttpRequest();
+            req.onreadystatechange = function () {
+                if (req.readyState == 4) {
+                    success(JSON.parse(req.responseText));
+                } else {
+
+                }
+            }
+            req.open('GET', url + "?" + EncodeHTMLForm(data));
+            req.send(null);
+        }
+        const conv = (record) => {
+            return record >= 0 ? record : 2 * 60 * 1000 - record;
+        };
+        const getLink = (status) => {
+            return `https://twitter.com/${status.username}/status/${status.statusid}`;
+        };
+        document.getElementById("submit").onclick = () => {
+            ajax('http://api.334.nenone.net', {
+                dateMin: document.getElementById("dateMin").value,
+                dateMax: document.getElementById("dateMax").value
+            }, (res) => {
+                res.sort((l, r) => { return conv(l.record) < conv(r.record) ? -1 : 1; });
+                document.getElementById("res").innerHTML = `
+                <table class="res"><tr><th>DATE</th><th>NAME</th><th>USERNAME</th><th>RECORD</th><th>CLIENT</th><th>LINK</th></tr>
+                ${res.map(e => {
+                    let date = new Date(e.date);
+                    return `<tr><td>${date.toLocaleDateString()}</td>
+                    <td>${`<a href="https://twitter.com/i/user/${e.userid}">${e.name}</a>`}</td>
+                    <td>${`<a href="https://twitter.com/i/user/${e.userid}">${e.username}</a>`}</td>
+                    <td>${(e.record / 1000).toFixed(3)}</td>
+                    <td>${e.client}</td>
+                    <td>${`<a href="${getLink(e)}">LINK</a>`}</td>
+                    </tr>`;
+                }).join('')}</table>`;
+            });
+        };
+    </script>
 </body>
 
 </html>
