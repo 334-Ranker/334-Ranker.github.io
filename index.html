@@ -70,7 +70,7 @@
             return `https://twitter.com/${status.username}/status/${status.statusid}`;
         };
         document.getElementById("submit").onclick = () => {
-            ajax('http://api.334.nenone.net', {
+            ajax('https://api.334.nenone.net', {
                 dateMin: document.getElementById("dateMin").value,
                 dateMax: document.getElementById("dateMax").value
             }, (res) => {
