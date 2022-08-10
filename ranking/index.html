@@ -1,1 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
 
+<head>
+    <meta charset="utf-8" />
+    <title>334-Ranker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script src="https://unpkg.com/chartjs-plugin-colorschemes"></script>
+    <style type="text/css">
+        table.res {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        table.res th,
+        table.res td {
+            padding: 4px;
+            border: solid 1px #af9d85;
+        }
+
+        table.res tr:nth-child(odd) {
+            background-color: #eee
+        }
+
+        input[type=text] {
+            padding: 6px;
+            border-radius: 4px;
+            border: none;
+            box-shadow: 0 0 0 1px #ccc inset;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+
+        input[type=text]:focus {
+            outline: 0;
+            box-shadow: 0 0 0 2px rgb(33, 150, 243) inset;
+        }
+
+        input[type=date] {
+            padding: 6px;
+            border-radius: 4px;
+            border: none;
+            box-shadow: 0 0 0 1px #ccc inset;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+
+        input[type=date]:focus {
+            outline: 0;
+            box-shadow: 0 0 0 2px rgb(33, 150, 243) inset;
+        }
+
+        input[type=submit] {
+            display: inline-block;
+            width: 100%;
+            padding: 6px;
+            border: none;
+            border-radius: 4px;
+            background-color: #afafaf;
+            color: #000;
+            font-weight: bold;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        input[type=submit]:hover {
+            background-color: #cfcfcf;
+            border: 2px solid #7f7f7f;
+        }
+
+        input[type=submit]:focus {
+            background-color: #cfcfcf;
+            border: 2px solid #7f7f7f;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>334-Ranker Point Ranking</h1>
+    <div id="res"><canvas id="canv"></canvas></div>
+    <script type="text/javascript">
+        const EncodeHTMLForm = (data) => {
+            let params = [];
+            for (let name in data) {
+                let value = data[name];
+                let param = encodeURIComponent(name) + '=' + encodeURIComponent(value);
+                params.push(param);
+            }
+            return params.join('&').replace(/%20/g, '+');
+        }
+        const ajax = (url, data, success) => {
+            let req = new XMLHttpRequest();
+            req.onreadystatechange = function () {
+                if (req.readyState == 4) {
+                    success(JSON.parse(req.responseText));
+                } else {
+
+                }
+            }
+            req.open('GET', url + ((typeof data) == "string" ? data : "?" + EncodeHTMLForm(data)));
+            req.send(null);
+        }
+        const route = () => {
+            ajax('https://api.334.nenone.net/ranking', [], (res) => {
+                console.log(res);
+                let canv = document.getElementById("canv");
+                let chart = new Chart(canv, {
+                    type: 'line', data: res, options: {
+                        plugins: {
+                            colorschemes: {
+                                scheme: 'brewer.Paired12'
+                            }
+                        }
+                    }
+                });
+            });
+        }
+        window.onhashchange = route;
+        route();
+    </script>
+</body>
+
+</html>
