@@ -51,6 +51,7 @@
             box-shadow: 0 0 0 2px rgb(33, 150, 243) inset;
         }
 
+        input[type=button],
         input[type=submit] {
             display: inline-block;
             width: 100%;
@@ -67,11 +68,13 @@
             border: 2px solid transparent;
         }
 
+        input[type=button]:hover,
         input[type=submit]:hover {
             background-color: #cfcfcf;
             border: 2px solid #7f7f7f;
         }
 
+        input[type=button]:focus,
         input[type=submit]:focus {
             background-color: #cfcfcf;
             border: 2px solid #7f7f7f;
@@ -107,12 +110,23 @@
     <h1>334-Ranker Records Explorer</h1>
     現在、2022/07/30以降のデータが入っています<br>
     検索オペレータは空白なら無指定になります。ただし結果は最大500件しか返しません<br>
+    級位ポイントのランキングは<a href="./ranking/">こちら</a><br>
     <table>
         <tr>
             <td>DATE-MIN</td>
             <td>DATE-MAX</td>
             <td>USERNAME</td>
             <td></td>
+        </tr>
+        <tr>
+            <td> <input type="button" id="resetDateMin" value="RESET">
+            </td>
+            <td> <input type="button" id="resetDateMax" value="RESET">
+            </td>
+            <td><input type="button" id="resetUsername" value="RESET">
+            </td>
+            <td>
+            </td>
         </tr>
         <tr>
             <td> <input type="date" id="dateMin">
@@ -124,6 +138,7 @@
             <td> <input type="submit" id="submit" value="SEARCH">
             </td>
         </tr>
+
     </table>
     <div id="loader" class="loader hidden"></div>
     <div id="res"></div>
@@ -193,6 +208,15 @@
                     document.getElementById("username").value = e[1];
                 }
             });
+        };
+        document.getElementById("resetDateMin").onclick = () => {
+            document.getElementById("dateMin").value = "";
+        };
+        document.getElementById("resetDateMax").onclick = () => {
+            document.getElementById("dateMax").value = "";
+        };
+        document.getElementById("resetUsername").onclick = () => {
+            document.getElementById("username").value = "";
         };
         const route = () => {
             setForm();
