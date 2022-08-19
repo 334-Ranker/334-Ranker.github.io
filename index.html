@@ -115,11 +115,12 @@
     <h1>334-Ranker Records Explorer</h1>
     現在、2022/07/30以降のデータが入っています<br>
     検索オペレータは空白なら無指定になります。ただし結果は最大500件しか返しません<br>
-    級位ポイントのランキングは<a href="./ranking/">こちら</a><br>
+    級位ポイントのランキングは<a href="./ranking/">こちら</a><br><br>
     <table>
         <tr>
             <td>DATE-MIN</td>
             <td>DATE-MAX</td>
+            <td>NAME(部分一致)</td>
             <td>USERNAME</td>
             <td>USERID</td>
             <td></td>
@@ -128,6 +129,8 @@
             <td> <input type="button" id="resetDateMin" value="RESET">
             </td>
             <td> <input type="button" id="resetDateMax" value="RESET">
+            </td>
+            <td><input type="button" id="resetName" value="RESET">
             </td>
             <td><input type="button" id="resetUsername" value="RESET">
             </td>
@@ -141,6 +144,8 @@
             </td>
             <td> <input type="date" id="dateMax">
             </td>
+            <td><input type="text" id="name">
+            </td>
             <td>@ <input type="text" id="username">
             </td>
             <td><input type="text" id="userid">
@@ -148,8 +153,8 @@
             <td> <input type="submit" id="submit" value="SEARCH">
             </td>
         </tr>
-
     </table>
+    <br>
     <div id="loader" class="loader hidden"></div>
     <div id="res"></div>
     <script type="text/javascript">
@@ -200,7 +205,7 @@
                 ${res.map(e => {
                     let date = new Date(e.date);
                     return `<tr><td>${++i}</td><td><a href="#/dateMin=${dateStr(date)}&dateMax=${dateStr(date)}">${dateStr(date)}</a></td>
-                    <td>${`<a href="https://twitter.com/i/user/${e.userid}">${e.name}</a>`}</td>
+                    <td>${`<a href="#/name=${e.name}">${e.name}</a>`}</td>
                     <td>${`<a href="#/username=${e.username}">${"@" + e.username}</a>`}</td>
                     <td>${`<a href="#/userid=${e.userid}">${e.userid}</a>`}</td>
                     <td>${(e.record / 1000).toFixed(3)}</td>
@@ -211,29 +216,18 @@
             });
         };
         document.getElementById("submit").onclick = () => {
-            location.hash =
-                "#/dateMin=" + document.getElementById("dateMin").value
-                + "&dateMax=" + document.getElementById("dateMax").value
-                + "&username=" + document.getElementById("username").value
-                + "&userid=" + document.getElementById("userid").value;
+            location.hash = "#/" +
+                ["dateMin", "dateMax", "name", "username", "userid"].map(e => {
+                    return e + "=" + document.getElementById(e).value;
+                }).join("&");
         };
         const setForm = () => {
             const qs = location.hash.slice(2).split("&");
-            document.getElementById("dateMin").value = "";
-            document.getElementById("dateMax").value = "";
-            document.getElementById("username").value = "";
-            document.getElementById("userid").value = "";
-
+            ["dateMin", "dateMax", "name", "username", "userid"].forEach(e => {
+                document.getElementById(e).value = "";
+            });
             qs.map(e => e.split("=")).forEach(e => {
-                if (e[0] == "dateMin") {
-                    document.getElementById("dateMin").value = e[1];
-                } else if (e[0] == "dateMax") {
-                    document.getElementById("dateMax").value = e[1];
-                } else if (e[0] == "username") {
-                    document.getElementById("username").value = e[1];
-                } else if (e[0] == "userid") {
-                    document.getElementById("userid").value = e[1];
-                }
+                if (document.getElementById(e[0])) document.getElementById(e[0]).value = decodeURI(e[1]);
             });
         };
         document.getElementById("resetDateMin").onclick = () => {
@@ -241,6 +235,9 @@
         };
         document.getElementById("resetDateMax").onclick = () => {
             document.getElementById("dateMax").value = "";
+        };
+        document.getElementById("name").onclick = () => {
+            document.getElementById("name").value = "";
         };
         document.getElementById("resetUsername").onclick = () => {
             document.getElementById("username").value = "";
@@ -259,6 +256,16 @@
         }
         window.onhashchange = route;
         route();
+        const getPoint = (record, i) => {
+            if (record < 0 || i > 90) {
+                return 0;
+            }
+            let x = 1000 * Math.pow(2, -record / 100);
+            if (i > 30) {
+                x *= (91 - i) / 61;
+            }
+            return x;
+        };
     </script>
 </body>
 
